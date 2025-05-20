@@ -12,18 +12,22 @@ class Modelo:
         self.model = gp.Model() # modelo
 
         ruta_archivos = {
-            'q_zt': path.join('parametros', 'capacidad_carga.csv'),
-            'costo_almacenamiento': path.join('parametros', 'costo_almacenamiento.csv'),
-            'cargadores_existentes': path.join('parametros', 'cargadores_existentes.csv'),
-            'costo_compra': path.join('parametros', 'costo_compra.csv'),
-            'costo_instalacion_electrica': path.join('parametros', 'costo_instalacion_electrica.csv'),
-            'infraestructura_existente': path.join('parametros', 'infraestructura_existente.csv'),
-            'alpha': path.join('parametros', 'alpha.csv'),
-            'delta': path.join('parametros', 'delta.csv'),
-            'K': path.join('parametros', 'K.csv'),
-            'AM': path.join('parametros', 'AM.csv'),
-            'd_ij': path.join('parametros', 'distance.csv')
-        }
+            'q_zt': path.join(BASE_DATOS, 'capacidad_carga.csv'), # DF LISTO
+            'c_t': path.join(BASE_DATOS, 'costo_almacenamiento.csv'), 
+            'k_zt': path.join(BASE_DATOS, 'cargadores_existentes.csv'),
+            'w_zt': path.join(BASE_DATOS, 'costo_compra.csv'),
+            'm_zt': path.join(BASE_DATOS, 'costo_instalacion_electrica.csv'),
+            'n_zt': path.join(BASE_DATOS, 'infraestructura_existente.csv'),
+            'P_1': path.join(BASE_DATOS, 'alpha.csv'),
+            'P_2': path.join(BASE_DATOS, 'delta.csv'),
+            'V': path.join(BASE_DATOS, 'K.csv'),
+            'V_o': path.join(BASE_DATOS, 'AM.csv'),
+            'd_t': path.join(BASE_DATOS, 'distance.csv'),
+            'gamma_z': path.join(BASE_DATOS, 'distance.csv'),
+            'K': path.join(BASE_DATOS, 'distance.csv'),
+            'Cenc_zt': path.join(BASE_DATOS, 'distance.csv'),
+            'Capg_zt': path.join(BASE_DATOS, 'distance.csv'),
+        }   
         pass
 
     def cargarParametros(self):
