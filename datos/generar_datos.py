@@ -9,5 +9,6 @@ def main():
     )
     df = sim_q_zt.run(guardar_csv=True, ruta_csv="output/q_zt.csv")
 
+    # TODO generar los otros csv para los parametros
 if __name__ == "__main__":
     main()

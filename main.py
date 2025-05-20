@@ -4,7 +4,7 @@ import gurobipy as gp
 from os import path
 import locale
 BASE_DATOS = "./datos"
-class Modelo:
+class ModeloNiebla:
 
     def __init__(self):
         self.T = range(1,24)
@@ -13,25 +13,25 @@ class Modelo:
 
         ruta_archivos = {
             'q_zt': path.join(BASE_DATOS, 'capacidad_carga.csv'), # DF LISTO
-            'c_t': path.join(BASE_DATOS, 'costo_almacenamiento.csv'), 
-            'k_zt': path.join(BASE_DATOS, 'cargadores_existentes.csv'),
-            'w_zt': path.join(BASE_DATOS, 'costo_compra.csv'),
-            'm_zt': path.join(BASE_DATOS, 'costo_instalacion_electrica.csv'),
-            'n_zt': path.join(BASE_DATOS, 'infraestructura_existente.csv'),
-            'P_1': path.join(BASE_DATOS, 'alpha.csv'),
-            'P_2': path.join(BASE_DATOS, 'delta.csv'),
-            'V': path.join(BASE_DATOS, 'K.csv'),
-            'V_o': path.join(BASE_DATOS, 'AM.csv'),
-            'd_t': path.join(BASE_DATOS, 'distance.csv'),
-            'gamma_z': path.join(BASE_DATOS, 'distance.csv'),
-            'K': path.join(BASE_DATOS, 'distance.csv'),
-            'Cenc_zt': path.join(BASE_DATOS, 'distance.csv'),
-            'Capg_zt': path.join(BASE_DATOS, 'distance.csv'),
+            'c_t': path.join(BASE_DATOS, 'costo_almacenamiento.csv'),  # TODO GENERAR DATOS
+            'k_zt': path.join(BASE_DATOS, 'cargadores_existentes.csv'), # TODO GENERAR DATOS
+            'w_zt': path.join(BASE_DATOS, 'costo_compra.csv'), # TODO GENERAR DATOS
+            'm_zt': path.join(BASE_DATOS, 'costo_instalacion_electrica.csv'), # TODO GENERAR DATOS
+            'n_zt': path.join(BASE_DATOS, 'infraestructura_existente.csv'), # TODO GENERAR DATOS
+            'P_1': path.join(BASE_DATOS, 'alpha.csv'), # TODO GENERAR DATOS
+            'P_2': path.join(BASE_DATOS, 'delta.csv'), # TODO GENERAR DATOS
+            'V': path.join(BASE_DATOS, 'K.csv'), # TODO GENERAR DATOS
+            'V_o': path.join(BASE_DATOS, 'AM.csv'), # TODO GENERAR DATOS
+            'd_t': path.join(BASE_DATOS, 'distance.csv'), # TODO GENERAR DATOS
+            'gamma_z': path.join(BASE_DATOS, 'distance.csv'), # TODO GENERAR DATOS
+            'K': path.join(BASE_DATOS, 'distance.csv'), # TODO GENERAR DATOS
+            'Cenc_zt': path.join(BASE_DATOS, 'distance.csv'), # TODO GENERAR DATOS
+            'Capg_zt': path.join(BASE_DATOS, 'distance.csv'), # TODO GENERAR DATOS
         }   
         pass
 
     def cargarParametros(self):
-
+        # TODO implementar funcion
         """
         Esta funcion debe extraer los parametros de los csv para asignar valores a los parametros
         """
@@ -74,7 +74,7 @@ class Modelo:
         self.model.update()
 
         #### RESTRICCIONES ####
-
+        # TODO implementar restricciones
         #######################
         q_zt = [[1,1,1] [2,2,2]] # TODO IMPLEMENTAR EN PARAMETROS
         self.model.setObjective(quicksum(a_zt[z][t]*q_zt[z][t] for z in self.Z for t in self.T ), GRB.MAXIMIZE)
@@ -101,3 +101,12 @@ class Modelo:
             return self.ObjVal
 
         pass
+
+def main():
+    modelo_niebla = ModeloNiebla()
+    modelo_niebla.cargarParametros()
+    modelo_niebla.definirModelo()
+    modelo_niebla.optimizar()
+
+if __name__ == "__main__":
+    main()
