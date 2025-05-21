@@ -121,7 +121,6 @@ class ModeloNiebla:
         self.model.addConstrs((quicksum(a_zt[z][t]* self.q_zt[z][t] for z in range(TOTAL_ZONAS/2 +1 ,TOTAL_ZONAS+1) <= self.K for t in self.T)),
                               name="R6: el agua recolectada en la zona NORTE no puede superar K en mes t")
         
-        
         self.model.addConstr((self.P_1 - (quicksum(self.k_zt[z][1]*x_zt[z][1] + self.w_zt[z][1]*r_zt[z][1] + self.m_zt[z][1]*a_zt[z][1] + self.n_zt[z][1]*s_zt[z][1] + self.Cenc_zt[z][1]*enc_zt[z][1] + self.Capg_zt[z][1]*apg_zt[z][1] for z in self.Z)  + self.c_t[1]*u_t[1]) == I_t[1]),
                               name="R7: presupuesto mes 1")
         
@@ -162,6 +161,27 @@ class ModeloNiebla:
         self.model.addConstrs((p_zt[z][t] <= s_zt[z][t] for z in self.Z for t in self.T),
                               name="R19: si hay atrapanieblas activos, entonces la caneria de la zona debe estar activa")
 
+        self.model.addConstrs((enc_zt[z][t] >= b_zt[z][t] - b_zt[z][t-1] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                              name="R20")
+        
+        self.model.addConstrs((enc_zt[z][t] <= b_zt[z][t] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                              name="R21")
+        
+        self.model.addConstrs((enc_zt[z][t] <= 1 - b_zt[z][t-1] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                              name="R22")
+        
+        self.model.addConstrs((apg_zt[z][t] >=  b_zt[z][t-1] - b_zt[z][t]  for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                              name="R23")
+        
+        self.model.addConstrs((apg_zt[z][t] <= b_zt[z][t-1] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                              name="R24")
+        
+        self.model.addConstrs((apg_zt[z][t] <= 1 - b_zt[z][t] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                              name="R25")
+        
+        self.model.addConstr((b_zt[z][1] == 0 for z in self.Z),
+                             name="R26")
+        
         #######################
         self.model.setObjective(quicksum(a_zt[z][t]*self.q_zt[z][t] for z in self.Z for t in self.T ), GRB.MAXIMIZE)
 
