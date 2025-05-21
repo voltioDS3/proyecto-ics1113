@@ -46,14 +46,13 @@ class ModeloNiebla:
         self.Cenc_zt = {z: {t: 0.0 for t in range(1, TOTAL_MESES + 1)} for z in range(1, TOTAL_ZONAS + 1)}
         self.Capg_zt = {z: {t: 0.0 for t in range(1, TOTAL_MESES + 1)} for z in range(1, TOTAL_ZONAS + 1)}
 
-        self.P_1 = {t: 0.0 for t in range(1, TOTAL_MESES + 1)}
-        self.P_2 = {t: 0.0 for t in range(1, TOTAL_MESES + 1)}
-        self.V = {t: 0.0 for t in range(1, TOTAL_MESES + 1)}
-        self.V_o = {t: 0.0 for t in range(1, TOTAL_MESES + 1)}
+        self.P_1 = 1
+        self.P_2 = 1
+        self.V = 50
+        self.V_o = 1
         self.d_t = {t: 0.0 for t in range(1, TOTAL_MESES + 1)}
         self.gamma_z = {t: 0.0 for t in range(1, TOTAL_MESES + 1)}
-        self.K = {t: 0.0 for t in range(1, TOTAL_MESES + 1)}
-
+        self.K = 1
         pass
 
     def cargarParametros(self):
@@ -103,87 +102,87 @@ class ModeloNiebla:
         #### RESTRICCIONES ####
         # TODO implementar restricciones
 
-        self.model.addConstrs((a_zt[z][t] <= quicksum(x_zt[z][tau] for tau in range(1,t+1)) for z in self.Z for t in self.T),
-                              name="R1: Metros cuadrados activos menor a instalados")
-        
-        self.model.addConstrs((quicksum(x_zt[z][t] for t in self.T) <= self.gamma_z[z] for z in self.Z),
-                              name="R2: restriccion metros cuadrados por motivos ambientales")
-        
-        self.model.addConstr((y_t[t-1] + quicksum(a_zt[z][t]*self.q_zt[z][t] for z in self.Z) + u_t[t] == y_t[t] + self.d_t[t] for t in range(2, TOTAL_MESES+1)),
-                             name="R3: litros de agua a almacenar")
+        self.model.addConstrs((a_zt[z, t] <= quicksum(x_zt[z, tau] for tau in range(1, t+1)) for z in self.Z for t in self.T),
+                      name="R1: Metros cuadrados activos menor a instalados")
 
-        self.model.addConstr((self.V_o + quicksum(a_zt[z][1]* self.q_zt[z][1] for z in self.Z) == y_t[1] + self.d_t[1]),
-                             "R4: condicion borde litros agua almacenada")
-        
-        self.model.addConstrs((quicksum(a_zt[z][t]* self.q_zt[z][t] for z in range(1,TOTAL_ZONAS/2 +1) <= self.K for t in self.T)),
-                              name="R5: el agua recolectada en la zona SUR no puede superar K en mes t")
-        
-        self.model.addConstrs((quicksum(a_zt[z][t]* self.q_zt[z][t] for z in range(TOTAL_ZONAS/2 +1 ,TOTAL_ZONAS+1) <= self.K for t in self.T)),
-                              name="R6: el agua recolectada en la zona NORTE no puede superar K en mes t")
-        
-        self.model.addConstr((self.P_1 - (quicksum(self.k_zt[z][1]*x_zt[z][1] + self.w_zt[z][1]*r_zt[z][1] + self.m_zt[z][1]*a_zt[z][1] + self.n_zt[z][1]*s_zt[z][1] + self.Cenc_zt[z][1]*enc_zt[z][1] + self.Capg_zt[z][1]*apg_zt[z][1] for z in self.Z)  + self.c_t[1]*u_t[1]) == I_t[1]),
-                              name="R7: presupuesto mes 1")
-        
-        self.model.addConstrs((I_t[t-1] - (quicksum(self.k_zt[z][t]*x_zt[z][t] + self.w_zt[z][1]*r_zt[z][t] + self.m_zt[z][t]*a_zt[z][t] + self.n_zt[z][t]*s_zt[z][t] + self.Cenc_zt[z][t]*enc_zt[z][t] + self.Capg_zt[z][t]*apg_zt[z][t] for z in self.Z)  + self.c_t[t]*u_t[t]) == I_t[t] for t in range(2, TOTAL_MESES/2 +1)),
-                              name="R8: presupuesto meses 2 a 12")
-        
-        self.model.addConstr((I_t[12]- (quicksum(self.k_zt[z][13]*x_zt[z][13] + self.w_zt[z][13]*r_zt[z][13] + self.m_zt[z][13]*a_zt[z][13] + self.n_zt[z][13]*s_zt[z][13] + self.Cenc_zt[z][13]*enc_zt[z][13] + self.Capg_zt[z][13]*apg_zt[z][13] for z in self.Z)  + self.c_t[13]*u_t[13]) + self.P_2 == I_t[13]),
-                              name="R9: presupuesto mes 13 con segundo ingreso por parte del gobierno")
-        
-        self.model.addConstrs((I_t[t-1] - (quicksum(self.k_zt[z][t]*x_zt[z][t] + self.w_zt[z][1]*r_zt[z][t] + self.m_zt[z][t]*a_zt[z][t] + self.n_zt[z][t]*s_zt[z][t] + self.Cenc_zt[z][t]*enc_zt[z][t] + self.Capg_zt[z][t]*apg_zt[z][t] for z in self.Z)  + self.c_t[t]*u_t[t]) == I_t[t] for t in range(TOTAL_MESES/2 + 2, TOTAL_MESES +1)),
-                              name="R10: presupuesto meses 14 a final")
-        
+        self.model.addConstrs((quicksum(x_zt[z, t] for t in self.T) <= self.gamma_z[z] for z in self.Z),
+                            name="R2: restriccion metros cuadrados por motivos ambientales")
+
+        self.model.addConstrs((y_t[t-1] + quicksum(a_zt[z, t]*self.q_zt[z][t] for z in self.Z) + u_t[t] == y_t[t] + self.d_t[t] for t in range(2, TOTAL_MESES+1)),
+                            name="R3: litros de agua a almacenar")
+
+        self.model.addConstr((self.V_o + quicksum(a_zt[z, 1]* self.q_zt[z][1] for z in self.Z) == y_t[1] + self.d_t[1]),
+                            "R4: condicion borde litros agua almacenada")
+
+        self.model.addConstrs((quicksum(a_zt[z, t]* self.q_zt[z][t] for z in range(1, int(TOTAL_ZONAS/2) + 1)) <= self.K for t in self.T),
+                            name="R5: el agua recolectada en la zona SUR no puede superar K en mes t")
+
+        self.model.addConstrs((quicksum(a_zt[z, t]* self.q_zt[z][t] for z in range(int(TOTAL_ZONAS/2) + 1, TOTAL_ZONAS + 1)) <= self.K for t in self.T),
+                            name="R6: el agua recolectada en la zona NORTE no puede superar K en mes t")
+
+        self.model.addConstr((self.P_1 - (quicksum(self.k_zt[z][1]*x_zt[z, 1] + self.w_zt[z][1]*r_zt[z, 1] + self.m_zt[z][1]*a_zt[z, 1] + self.n_zt[z][1]*s_zt[z, 1] + self.Cenc_zt[z][1]*enc_zt[z, 1] + self.Capg_zt[z][1]*apg_zt[z, 1] for z in self.Z)  + self.c_t[1]*u_t[1]) == I_t[1]),
+                            name="R7: presupuesto mes 1")
+
+        self.model.addConstrs((I_t[t-1] - (quicksum(self.k_zt[z][t]*x_zt[z, t] + self.w_zt[z][1]*r_zt[z, t] + self.m_zt[z][t]*a_zt[z, t] + self.n_zt[z][t]*s_zt[z, t] + self.Cenc_zt[z][t]*enc_zt[z, t] + self.Capg_zt[z][t]*apg_zt[z, t] for z in self.Z)  + self.c_t[t]*u_t[t]) == I_t[t] for t in range(2, int(TOTAL_MESES/2) + 1)),
+                            name="R8: presupuesto meses 2 a 12")
+
+        self.model.addConstr((I_t[12] - (quicksum(self.k_zt[z][13]*x_zt[z, 13] + self.w_zt[z][13]*r_zt[z, 13] + self.m_zt[z][13]*a_zt[z, 13] + self.n_zt[z][13]*s_zt[z, 13] + self.Cenc_zt[z][13]*enc_zt[z, 13] + self.Capg_zt[z][13]*apg_zt[z, 13] for z in self.Z)  + self.c_t[13]*u_t[13]) + self.P_2 == I_t[13]),
+                            name="R9: presupuesto mes 13 con segundo ingreso por parte del gobierno")
+
+        self.model.addConstrs((I_t[t-1] - (quicksum(self.k_zt[z][t]*x_zt[z, t] + self.w_zt[z][1]*r_zt[z, t] + self.m_zt[z][t]*a_zt[z, t] + self.n_zt[z][t]*s_zt[z, t] + self.Cenc_zt[z][t]*enc_zt[z, t] + self.Capg_zt[z][t]*apg_zt[z, t] for z in self.Z)  + self.c_t[t]*u_t[t]) == I_t[t] for t in range(int(TOTAL_MESES/2) + 2, TOTAL_MESES + 1)),
+                            name="R10: presupuesto meses 14 a final")
+
         self.model.addConstrs((I_t[t] >= 0 for t in self.T),
-                              name="R11: presupuesto no puede ser negativo")
-        
-        self.model.addConstrs((y_t[t] <= self.V for t in self.T),
-                              name="R12: no se puede superar la capcidad de almaceniamiento")
-        
-        self.model.addConstrs((b_zt[z][t] <= quicksum(r_zt[z][tau] for tau in range(1, t+1)) for z in self.Z for t in self.T),
-                              name="R13: una subzona solamente se puede activar si ya se construyo la caneria que la conecta")
-        
-        self.model.addConstrs((s_zt[z][t] <= quicksum(r_zt[z][tau] for tau in range(1, t+1)) for z in self.Z for t in self.T),
-                              name="R14: Asegura que una caneria puede estar activa solo si ya se ha instalado")
-        
-        self.model.addConstrs((p_zt[z][t] <= b_zt[z][t] for z in self.Z for t in self.T),
-                              name="R15: solamente se puede recolectar si la zona esta activa")
-        
-        M = 100000000
-        self.model.addConstrs((a_zt[z][t] <= M*p_zt[z][t] for z in self.Z for t in self.T),
-                              name="R16: solamente se puede recolectar si la zona esta activa")
-        
-        self.model.addConstrs((quicksum(r_zt[z][t] for t in self.T) <= 1 for z in self.Z),
-                              name="R17: se puede instalar solo una caneria por zona ")
-        
-        self.model.addConstrs((x_zt[z][t] <= M*quicksum(r_zt[z][tau] for tau in range(1, t+1)) for z in self.Z for t in self.T),
-                              name="R18: debe existir una caneria antes de instalar cualquier cantidad de metros cuadrados en la zona z en t")
-        
-        self.model.addConstrs((p_zt[z][t] <= s_zt[z][t] for z in self.Z for t in self.T),
-                              name="R19: si hay atrapanieblas activos, entonces la caneria de la zona debe estar activa")
+                            name="R11: presupuesto no puede ser negativo")
 
-        self.model.addConstrs((enc_zt[z][t] >= b_zt[z][t] - b_zt[z][t-1] for z in self.Z for t in range(2, TOTAL_MESES+1)),
-                              name="R20")
-        
-        self.model.addConstrs((enc_zt[z][t] <= b_zt[z][t] for z in self.Z for t in range(2, TOTAL_MESES+1)),
-                              name="R21")
-        
-        self.model.addConstrs((enc_zt[z][t] <= 1 - b_zt[z][t-1] for z in self.Z for t in range(2, TOTAL_MESES+1)),
-                              name="R22")
-        
-        self.model.addConstrs((apg_zt[z][t] >=  b_zt[z][t-1] - b_zt[z][t]  for z in self.Z for t in range(2, TOTAL_MESES+1)),
-                              name="R23")
-        
-        self.model.addConstrs((apg_zt[z][t] <= b_zt[z][t-1] for z in self.Z for t in range(2, TOTAL_MESES+1)),
-                              name="R24")
-        
-        self.model.addConstrs((apg_zt[z][t] <= 1 - b_zt[z][t] for z in self.Z for t in range(2, TOTAL_MESES+1)),
-                              name="R25")
-        
-        self.model.addConstr((b_zt[z][1] == 0 for z in self.Z),
-                             name="R26")
-        
+        self.model.addConstrs((y_t[t] <= self.V for t in self.T),
+                            name="R12: no se puede superar la capcidad de almaceniamiento")
+
+        self.model.addConstrs((b_zt[z, t] <= quicksum(r_zt[z, tau] for tau in range(1, t+1)) for z in self.Z for t in self.T),
+                            name="R13: una subzona solamente se puede activar si ya se construyo la caneria que la conecta")
+
+        self.model.addConstrs((s_zt[z, t] <= quicksum(r_zt[z, tau] for tau in range(1, t+1)) for z in self.Z for t in self.T),
+                            name="R14: Asegura que una caneria puede estar activa solo si ya se ha instalado")
+
+        self.model.addConstrs((p_zt[z, t] <= b_zt[z, t] for z in self.Z for t in self.T),
+                            name="R15: solamente se puede recolectar si la zona esta activa")
+
+        M = 100000000
+        self.model.addConstrs((a_zt[z, t] <= M*p_zt[z, t] for z in self.Z for t in self.T),
+                            name="R16: solamente se puede recolectar si la zona esta activa")
+
+        self.model.addConstrs((quicksum(r_zt[z, t] for t in self.T) <= 1 for z in self.Z),
+                            name="R17: se puede instalar solo una caneria por zona")
+
+        self.model.addConstrs((x_zt[z, t] <= M*quicksum(r_zt[z, tau] for tau in range(1, t+1)) for z in self.Z for t in self.T),
+                            name="R18: debe existir una caneria antes de instalar cualquier cantidad de metros cuadrados en la zona z en t")
+
+        self.model.addConstrs((p_zt[z, t] <= s_zt[z, t] for z in self.Z for t in self.T),
+                            name="R19: si hay atrapanieblas activos, entonces la caneria de la zona debe estar activa")
+
+        self.model.addConstrs((enc_zt[z, t] >= b_zt[z, t] - b_zt[z, t-1] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                            name="R20")
+
+        self.model.addConstrs((enc_zt[z, t] <= b_zt[z, t] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                            name="R21")
+
+        self.model.addConstrs((enc_zt[z, t] <= 1 - b_zt[z, t-1] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                            name="R22")
+
+        self.model.addConstrs((apg_zt[z, t] >= b_zt[z, t-1] - b_zt[z, t] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                            name="R23")
+
+        self.model.addConstrs((apg_zt[z, t] <= b_zt[z, t-1] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                            name="R24")
+
+        self.model.addConstrs((apg_zt[z, t] <= 1 - b_zt[z, t] for z in self.Z for t in range(2, TOTAL_MESES+1)),
+                            name="R25")
+
+        self.model.addConstrs((b_zt[z, 1] == 0 for z in self.Z),
+                            name="R26")
+                
         #######################
-        self.model.setObjective(quicksum(a_zt[z][t]*self.q_zt[z][t] for z in self.Z for t in self.T ), GRB.MAXIMIZE)
+        self.model.setObjective(quicksum(a_zt[z,t]*self.q_zt[z][t] for z in self.Z for t in self.T ), GRB.MAXIMIZE)
 
     def optimizar(self):
         self.model.optimize()
