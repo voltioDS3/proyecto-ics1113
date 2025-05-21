@@ -3,7 +3,7 @@ from gurobipy import GRB, quicksum
 import gurobipy as gp
 from os import path
 import locale
-BASE_DATOS = "./datos"
+BASE_DATOS = "./datos/output"
 class ModeloNiebla:
 
     def __init__(self):
@@ -12,8 +12,9 @@ class ModeloNiebla:
         self.model = gp.Model() # modelo
 
         ruta_archivos = {
-            'q_zt': path.join(BASE_DATOS, 'capacidad_carga.csv'), # DF LISTO
-            'c_t': path.join(BASE_DATOS, 'costo_almacenamiento.csv'),  # TODO GENERAR DATOS
+            'q_zt': path.join(BASE_DATOS, 'q_zt.csv'), # DF LISTO
+            'c_t': path.join(BASE_DATOS, 'c_t.csv'),  # DF LISTO
+            'csobre_t': path.join(BASE_DATOS, 'costo_almacenamiento.csv'), ## TODO costo sobre consumo experimental
             'k_zt': path.join(BASE_DATOS, 'cargadores_existentes.csv'), # TODO GENERAR DATOS
             'w_zt': path.join(BASE_DATOS, 'costo_compra.csv'), # TODO GENERAR DATOS
             'm_zt': path.join(BASE_DATOS, 'costo_instalacion_electrica.csv'), # TODO GENERAR DATOS
@@ -32,6 +33,7 @@ class ModeloNiebla:
 
     def cargarParametros(self):
         # TODO implementar funcion
+        
         """
         Esta funcion debe extraer los parametros de los csv para asignar valores a los parametros
         """
