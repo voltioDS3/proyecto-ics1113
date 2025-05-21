@@ -4,36 +4,46 @@ import gurobipy as gp
 from os import path
 import locale
 BASE_DATOS = "./datos/output"
+TOTAL_MESES = 24    
+TOTAL_ZONAS = 10
 class ModeloNiebla:
 
     def __init__(self):
-        self.T = range(1,24)
-        self.Z = range(1,10) #de la zona 1 a la zona 5 son zona sur, de la 6 hasta la 10 zona norte
+        self.T = range(1,TOTAL_MESES+1)
+        self.Z = range(1,TOTAL_ZONAS+1) #de la zona 1 a la zona 5 son zona sur, de la 6 hasta la 10 zona norte
         self.model = gp.Model() # modelo
 
         ruta_archivos = {
             'q_zt': path.join(BASE_DATOS, 'q_zt.csv'), # DF LISTO
             'c_t': path.join(BASE_DATOS, 'c_t.csv'),  # DF LISTO
-            'csobre_t': path.join(BASE_DATOS, 'costo_almacenamiento.csv'), ## TODO costo sobre consumo experimental
-            'k_zt': path.join(BASE_DATOS, 'cargadores_existentes.csv'), # TODO GENERAR DATOS
-            'w_zt': path.join(BASE_DATOS, 'costo_compra.csv'), # TODO GENERAR DATOS
-            'm_zt': path.join(BASE_DATOS, 'costo_instalacion_electrica.csv'), # TODO GENERAR DATOS
-            'n_zt': path.join(BASE_DATOS, 'infraestructura_existente.csv'), # TODO GENERAR DATOS
-            'P_1': path.join(BASE_DATOS, 'alpha.csv'), # TODO GENERAR DATOS
-            'P_2': path.join(BASE_DATOS, 'delta.csv'), # TODO GENERAR DATOS
-            'V': path.join(BASE_DATOS, 'K.csv'), # TODO GENERAR DATOS
-            'V_o': path.join(BASE_DATOS, 'AM.csv'), # TODO GENERAR DATOS
-            'd_t': path.join(BASE_DATOS, 'distance.csv'), # TODO GENERAR DATOS
-            'gamma_z': path.join(BASE_DATOS, 'distance.csv'), # TODO GENERAR DATOS
-            'K': path.join(BASE_DATOS, 'distance.csv'), # TODO GENERAR DATOS
-            'Cenc_zt': path.join(BASE_DATOS, 'distance.csv'), # TODO GENERAR DATOS
-            'Capg_zt': path.join(BASE_DATOS, 'distance.csv'), # TODO GENERAR DATOS
-        }   
+            'csobre_t': path.join(BASE_DATOS, 'csobre_t.csv'), ## TODO costo sobre consumo experimental
+            'k_zt': path.join(BASE_DATOS, 'k_zt.csv'), # TODO GENERAR DATOS
+            'w_zt': path.join(BASE_DATOS, 'w_zt.csv'), # TODO GENERAR DATOS
+            'm_zt': path.join(BASE_DATOS, 'm_zt.csv'), # TODO GENERAR DATOS
+            'n_zt': path.join(BASE_DATOS, 'n_zt.csv'), # TODO GENERAR DATOS
+            'P_1': path.join(BASE_DATOS, 'P_1.csv'), # TODO GENERAR DATOS
+            'P_2': path.join(BASE_DATOS, 'P_2.csv'), # TODO GENERAR DATOS
+            'V': path.join(BASE_DATOS, 'V.csv'), # TODO GENERAR DATOS
+            'V_o': path.join(BASE_DATOS, 'V_o.csv'), # TODO GENERAR DATOS
+            'd_t': path.join(BASE_DATOS, 'd_t.csv'), # TODO GENERAR DATOS
+            'gamma_z': path.join(BASE_DATOS, 'gamma_z.csv'), # TODO GENERAR DATOS
+            'K': path.join(BASE_DATOS, 'K.csv'), # TODO GENERAR DATOS
+            'Cenc_zt': path.join(BASE_DATOS, 'Cenc_zt.csv'), # TODO GENERAR DATOS
+            'Capg_zt': path.join(BASE_DATOS, 'Capg_zt.csv'), # TODO GENERAR DATOS
+        }
+
+        df = pd.read_csv(ruta_archivos['q_zt'])
+        self.q_zt = {z+1: {int(t): df.loc[z, t] for t in df.columns if t.isdigit()} for z in df.index}
+
+        df = pd.read_csv(ruta_archivos['c_t'])
+        self.c_t = df.set_index('t')['c_t'].to_dict()
+
+
         pass
 
     def cargarParametros(self):
         # TODO implementar funcion
-        
+
         """
         Esta funcion debe extraer los parametros de los csv para asignar valores a los parametros
         """
