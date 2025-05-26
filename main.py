@@ -34,7 +34,6 @@ class ModeloNiebla:
 
         df = pd.read_csv(ruta_archivos['q_zt'])
         self.q_zt = {z+1: {int(t): df.loc[z, t] for t in df.columns if t.isdigit()} for z in df.index}
-
         df = pd.read_csv(ruta_archivos['c_t'])
         self.c_t = df.set_index('t')['c_t'].to_dict()
 

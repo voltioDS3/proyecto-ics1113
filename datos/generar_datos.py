@@ -1,7 +1,7 @@
 from modulos_generacion import generar_q_zt
 from modulos_generacion import generar_c_t
 TOTAL_ZONAS = 10
-TOTAL_MESES = 25
+TOTAL_MESES = 24
 
 def main():
     sim_q_zt = generar_q_zt.SimularExtracionq_zt(
