@@ -24,7 +24,7 @@ class GenerarCostoApagado:
                 infl = 1 + self.inflation_rate * (t - 1)
                 ruido = np.random.normal(0, base * 0.05)
                 capgzt = max(base * infl + ruido, 0)
-                datos.append({'z': z, 't': t, 'capg_zt': capgzt})
+                datos.append({'z': z, 't': t, 'Capg_zt': capgzt})
         df = pd.DataFrame(datos)
         if guardar_csv:
             if not ruta_csv:

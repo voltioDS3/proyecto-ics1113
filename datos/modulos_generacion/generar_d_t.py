@@ -9,7 +9,7 @@ class GenerarDemandaDt:
     def __init__(self,
                  total_meses=24,
                  poblacion=150000,
-                 consumo_diario=150,  # L/día por habitante
+                 consumo_diario=90,  # L/día por habitante
                  dias_mes=30):
         self.T = range(1, total_meses+1)
         self.poblacion = poblacion

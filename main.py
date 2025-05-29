@@ -58,7 +58,6 @@ class ModeloNiebla:
     def cargarParametros(self):
         ruta = BASE_DATOS
 
-        # cargamos k_zt, w_zt, m_zt, n_zt, Cenc_zt, Capg_zt
         archivos_zt = {
             'k_zt': 'k_zt.csv',
             'w_zt': 'w_zt.csv',
@@ -69,15 +68,19 @@ class ModeloNiebla:
         }
 
         for nombre_parametro, archivo in archivos_zt.items():
-            df = pd.read_csv(path.join(ruta, archivo), index_col=0)
+            df = pd.read_csv(path.join(ruta, archivo))
+
+            # Suponemos que siempre hay columnas z, t y <nombre_parametro>
             parametro = {}
-            for z_str in df.index:
-                z = int(z_str)
-                parametro[z] = {}
-                for t_str in df.columns:
-                    if t_str.isdigit():
-                        t = int(t_str)
-                        parametro[z][t] = df.loc[z_str, t_str]
+            for _, fila in df.iterrows():
+                z = int(fila['z'])
+                t = int(fila['t'])
+                valor = fila[nombre_parametro]
+
+                if z not in parametro:
+                    parametro[z] = {}
+                parametro[z][t] = valor
+
             setattr(self, nombre_parametro, parametro)
 
         # cargamos d_t.csv
@@ -95,12 +98,15 @@ class ModeloNiebla:
             self.gamma_z[z] = float(row["gamma_z"])
 
         # cargamos escalares
-        self.P_1 = float(pd.read_csv(path.join(ruta, "P_1.csv")).iloc[0, 0])
-        self.P_2 = float(pd.read_csv(path.join(ruta, "P_2.csv")).iloc[0, 0])
-        self.V    = float(pd.read_csv(path.join(ruta, "V.csv")).iloc[0, 0])
-        self.V_o  = float(pd.read_csv(path.join(ruta, "V_o.csv")).iloc[0, 0])
-        self.K    = float(pd.read_csv(path.join(ruta, "K.csv")).iloc[0, 0])
-
+        self.P_1 = 500000000
+        self.P_2 = 300000000
+        self.V    = 1000000
+        self.V_o  = 0
+        self.K    = 150000000
+        print(self.k_zt[1][23])
+        print(self.Capg_zt[1][23])
+        print(self.K)
+        
     def definirModelo(self):
         
         a_zt = self.model.addVars(self.Z, self.T,lb=0.0,
@@ -150,7 +156,7 @@ class ModeloNiebla:
         self.model.addConstrs((y_t[t-1] + quicksum(a_zt[z, t]*self.q_zt[z][t] for z in self.Z) + u_t[t] == y_t[t] + self.d_t[t] for t in range(2, TOTAL_MESES+1)),
                             name="R3: litros de agua a almacenar")
 
-        self.model.addConstr((self.V_o + quicksum(a_zt[z, 1]* self.q_zt[z][1] for z in self.Z) == y_t[1] + self.d_t[1]),
+        self.model.addConstr((self.V_o + quicksum(a_zt[z, 1]* self.q_zt[z][1] for z in self.Z) + u_t[1] == y_t[1] + self.d_t[1]),
                             "R4: condicion borde litros agua almacenada")
 
         self.model.addConstrs((quicksum(a_zt[z, t]* self.q_zt[z][t] for z in range(1, int(TOTAL_ZONAS/2) + 1)) <= self.K for t in self.T),
@@ -186,7 +192,7 @@ class ModeloNiebla:
         self.model.addConstrs((p_zt[z, t] <= b_zt[z, t] for z in self.Z for t in self.T),
                             name="R15: solamente se puede recolectar si la zona esta activa")
 
-        M = 100000000
+        M = 100000000000000000
         self.model.addConstrs((a_zt[z, t] <= M*p_zt[z, t] for z in self.Z for t in self.T),
                             name="R16: solamente se puede recolectar si la zona esta activa")
 
@@ -224,6 +230,8 @@ class ModeloNiebla:
         self.model.setObjective(quicksum(a_zt[z,t]*self.q_zt[z][t] for z in self.Z for t in self.T ), GRB.MAXIMIZE)
 
     def optimizar(self):
+        self.model.setParam("InfUnbdInfo", 1)
+        self.model.setParam("DualReductions", 0)
         self.model.optimize()
 
         if self.model.status == GRB.INFEASIBLE:
@@ -231,6 +239,8 @@ class ModeloNiebla:
             print('El modelo es infactible')
             self.model.computeIIS()
             self.model.write('modelo.ilp')
+            self.model.computeIIS()  # También detecta infeasibilidades
+            self.model.write("model.lp")  # Puedes ver los coeficientes y escalas
             return None
 
         elif self.model.status == GRB.UNBOUNDED:
