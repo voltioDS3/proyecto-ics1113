@@ -6,6 +6,7 @@ class GenerarDemandaDt:
     """
     Simula dt: litros demandados en t por la población.
     """
+
     def __init__(self,
                  total_meses=24,
                  poblacion=150000,
@@ -19,7 +20,7 @@ class GenerarDemandaDt:
     def generar(self, guardar_csv=False, ruta_csv=None):
         datos = []
         for t in self.T:
-            base = self.poblacion * self.consumo_diario * self.dias
+            base = self.poblacion * self.consumo_diario * self.dias * 1e-6
             ruido = np.random.normal(0, base * 0.05)
             dt = max(base + ruido, 0)
             datos.append({'t': t, 'd_t': dt})

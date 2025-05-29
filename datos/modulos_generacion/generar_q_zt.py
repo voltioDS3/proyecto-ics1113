@@ -68,7 +68,7 @@ class SimularExtracionq_zt:
             x, y = zona['coord']
             prod = {}
             for mes in meses:
-                prod[mes] = self._factor_distancia(x, self.zona_sur_dim[0]) * self.max_sur[mes]
+                prod[mes] = self._factor_distancia(x, self.zona_sur_dim[0]) * self.max_sur[mes] * 1e-6 
             zona['produccion'] = prod
 
         # Norte
@@ -76,7 +76,7 @@ class SimularExtracionq_zt:
             x, y = zona['coord']
             prod = {}
             for mes in meses:
-                prod[mes] = self._factor_distancia(x, self.zona_norte_dim[0]) * self.max_norte[mes]
+                prod[mes] = self._factor_distancia(x, self.zona_norte_dim[0]) * self.max_norte[mes] * 1e-6 
             zona['produccion'] = prod
 
     def calcular_distancias(self):
