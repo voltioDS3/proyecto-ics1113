@@ -1,6 +1,7 @@
 import pandas as pd
 from gurobipy import GRB, quicksum
 import gurobipy as gp
+import os
 from os import path
 import locale
 BASE_DATOS = "./datos/output"
@@ -55,12 +56,51 @@ class ModeloNiebla:
         pass
 
     def cargarParametros(self):
-        # TODO implementar funcion
+        ruta = BASE_DATOS
 
-        """
-        Esta funcion debe extraer los parametros de los csv para asignar valores a los parametros
-        """
-        pass
+        # cargamos k_zt, w_zt, m_zt, n_zt, Cenc_zt, Capg_zt
+        archivos_zt = {
+            'k_zt': 'k_zt.csv',
+            'w_zt': 'w_zt.csv',
+            'm_zt': 'm_zt.csv',
+            'n_zt': 'n_zt.csv',
+            'Cenc_zt': 'Cenc_zt.csv',
+            'Capg_zt': 'Capg_zt.csv'
+        }
+
+        for nombre_parametro, archivo in archivos_zt.items():
+            df = pd.read_csv(path.join(ruta, archivo), index_col=0)
+            parametro = {}
+            for z_str in df.index:
+                z = int(z_str)
+                parametro[z] = {}
+                for t_str in df.columns:
+                    if t_str.isdigit():
+                        t = int(t_str)
+                        parametro[z][t] = df.loc[z_str, t_str]
+            setattr(self, nombre_parametro, parametro)
+
+        # cargamos d_t.csv
+        df_d_t = pd.read_csv(path.join(ruta, "d_t.csv"))
+        self.d_t = {}
+        for _, row in df_d_t.iterrows():
+            t = int(row["t"])
+            self.d_t[t] = float(row["d_t"])
+
+        # cargamos gamma_z.csv
+        df_gamma = pd.read_csv(path.join(ruta, "gamma_z.csv"))
+        self.gamma_z = {}
+        for _, row in df_gamma.iterrows():
+            z = int(row["z"])
+            self.gamma_z[z] = float(row["gamma_z"])
+
+        # cargamos escalares
+        self.P_1 = float(pd.read_csv(path.join(ruta, "P_1.csv")).iloc[0, 0])
+        self.P_2 = float(pd.read_csv(path.join(ruta, "P_2.csv")).iloc[0, 0])
+        self.V    = float(pd.read_csv(path.join(ruta, "V.csv")).iloc[0, 0])
+        self.V_o  = float(pd.read_csv(path.join(ruta, "V_o.csv")).iloc[0, 0])
+        self.K    = float(pd.read_csv(path.join(ruta, "K.csv")).iloc[0, 0])
+
     def definirModelo(self):
         
         a_zt = self.model.addVars(self.Z, self.T,lb=0.0,
@@ -200,11 +240,20 @@ class ModeloNiebla:
         elif self.model.status == GRB.INF_OR_UNBD:
             print('El modelo es infactible o no acotado')
             return None
-
+        
         else:
+            os.makedirs("resultados", exist_ok=True)
+
+            # guardar vars con sus optimos
+            with open("resultados/optimos.csv", "w") as f:
+                f.write("variable,valor\n")
+                for v in self.model.getVars():
+                    f.write(f"{v.VarName},{v.X}\n")
+
             return self.model.ObjVal
 
-        pass
+        #else:
+            #return self.model.ObjVal
 
 def main():
     modelo_niebla = ModeloNiebla()
