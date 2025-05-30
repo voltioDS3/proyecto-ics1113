@@ -230,8 +230,6 @@ class ModeloNiebla:
         self.model.setObjective(quicksum(a_zt[z,t]*self.q_zt[z][t] for z in self.Z for t in self.T ), GRB.MAXIMIZE)
 
     def optimizar(self):
-        self.model.setParam("InfUnbdInfo", 1)
-        self.model.setParam("DualReductions", 0)
         self.model.optimize()
 
         if self.model.status == GRB.INFEASIBLE:
@@ -259,17 +257,19 @@ class ModeloNiebla:
                 f.write("variable,valor\n")
                 for v in self.model.getVars():
                     f.write(f"{v.VarName},{v.X}\n")
-
+            
             return self.model.ObjVal
 
         #else:
             #return self.model.ObjVal
+   
 
 def main():
     modelo_niebla = ModeloNiebla()
     modelo_niebla.cargarParametros()
     modelo_niebla.definirModelo()
     modelo_niebla.optimizar()
+   
 
 if __name__ == "__main__":
     main()
