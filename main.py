@@ -6,7 +6,7 @@ from os import path
 import locale
 BASE_DATOS = "./datos/output"
 TOTAL_MESES = 24    
-TOTAL_ZONAS = 10
+TOTAL_ZONAS = 20
 class ModeloNiebla:
 
     def __init__(self):
@@ -100,9 +100,9 @@ class ModeloNiebla:
         # cargamos escalares
         self.P_1 = 500000000
         self.P_2 = 300000000
-        self.V    = 1000000
+        self.V    = 10000000*1e-6
         self.V_o  = 0
-        self.K    = 150000000
+        self.K    = 150000000*1e-6
         print(self.k_zt[1][23])
         print(self.Capg_zt[1][23])
         print(self.K)

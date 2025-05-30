@@ -15,7 +15,7 @@ from modulos_generacion import generar_v
 from modulos_generacion import generar_v0
 from modulos_generacion import generar_w_zt
 
-TOTAL_ZONAS = 10
+TOTAL_ZONAS = 20
 TOTAL_MESES = 24
 RUTA= "/output/"
 def main():
