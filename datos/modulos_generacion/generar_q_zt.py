@@ -22,7 +22,6 @@ class SimularExtracionq_zt:
         self.coord_sur = np.array(coords_caneria_sur)
         self.coord_norte = np.array(coords_caneria_norte)
 
-        # Diccionarios por defecto si no se proveen
         self.max_sur = maximo_mes_zona_sur or {
             'enero': 0, 'febrero': 0, 'marzo': 0, 'abril': 0,
             'mayo': 3.5*30, 'junio': 1.5*30, 'julio': 4.5*30,
@@ -36,7 +35,7 @@ class SimularExtracionq_zt:
             'noviembre': 5.8*30, 'diciembre': 0
         }
 
-        # Listas donde guardaremos la info de las zonas
+
         self.zonas_sur = []
         self.zonas_norte = []
 
@@ -128,9 +127,9 @@ class SimularExtracionq_zt:
         return self.generar_dataframe(**kwargs)
 
 
-# --- Uso desde otra parte del código ---
 
-# Por ejemplo, en tu función principal:
+
+
 def main():
     sim = SimularExtracionq_zt(total_zonas=12, total_meses=36)
     df = sim.run(guardar_csv=True, ruta_csv="output/produccion.csv")
