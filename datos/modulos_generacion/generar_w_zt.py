@@ -3,23 +3,18 @@ import numpy as np
 import os
 
 class SimularCostoWzt:
-    """
-    Simula w_zt: costo de instalar la conexión (cañería) en la zona z y mes t (CLP).
-    """
     def __init__(self,
                  total_zonas=10,
                  total_meses=24,
-                 costo_range_conexion=(20000, 40000),  # CLP por metro instalado
+                 costo_fijo_conexion=4142,
                  inflation_rate=0.005):
         self.Z = list(range(1, total_zonas + 1))
         self.T = list(range(1, total_meses + 1))
-        self.costo_range = costo_range_conexion
+        self.costo_fijo = costo_fijo_conexion
         self.inflation_rate = inflation_rate
 
-        # Factor de dificultad por zona (simétrico fácil/difícil)
         n_easy = total_zonas // 2
-        factors = [1.0]*n_easy + list(np.random.uniform(1.2, 1.5, size=total_zonas - n_easy))
-        np.random.shuffle(factors)
+        factors = [1.0] * n_easy + [1.3] * (total_zonas - n_easy)
         self.factor_dificultad = {z: factors[z-1] for z in self.Z}
 
     def generar(self, guardar_csv=False, ruta_csv=None):
@@ -27,10 +22,8 @@ class SimularCostoWzt:
         for z in self.Z:
             fz = self.factor_dificultad[z]
             for t in self.T:
-                base = np.random.uniform(*self.costo_range)
                 infl = 1 + self.inflation_rate * (t - 1)
-                ruido = np.random.normal(0, base * 0.05)
-                wzt = max(base * fz * infl + ruido, 0)
+                wzt = self.costo_fijo * fz * infl
                 datos.append({'z': z, 't': t, 'w_zt': wzt})
         df = pd.DataFrame(datos)
         if guardar_csv:
