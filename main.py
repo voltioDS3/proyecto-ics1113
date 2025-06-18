@@ -257,6 +257,7 @@ class ModeloNiebla:
                 f.write("variable,valor\n")
                 for v in self.model.getVars():
                     f.write(f"{v.VarName},{v.X}\n")
+                f.write(f"ObjVal,{self.model.ObjVal}\n")
             
             return self.model.ObjVal
 
