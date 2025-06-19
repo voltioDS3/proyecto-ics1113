@@ -1,10 +1,11 @@
 Escenario,Objetivo (M L)
-K_base,80.87
-K_mas,80.87
-K_menos,80.87
-P1_base,80.87
-P1_mas,87.69
-P1_menos,70.05
-gamma_base,80.87
-gamma_mas30,92.48
-gamma_menos30,62.32
+gamma_base,65.52
+gamma_mas30,85.17
+gamma_menos30,45.86
+mixto_critico,32.1
+mixto_humedo_restringido,59.62
+mixto_optimo,110.72
+mixto_seco_flexible,59.62
+q_base,65.52
+q_mas30,85.17
+q_menos30,45.86
